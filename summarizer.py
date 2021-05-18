@@ -10,7 +10,7 @@ def tokenizeSentences(text):
     return [word_tokenize(i) for i in sent_tokenize(text)]
 
 
-def SteinbergerAndJezek(sigma, v, K):
+def SteinbergerAndJezek(sigma, v, K, N):
     sk = []
 
     for k in range(K):
@@ -21,10 +21,8 @@ def SteinbergerAndJezek(sigma, v, K):
         sk += [(np.sqrt(sum_), k)]
 
     sk_sorted = sorted(sk, key=lambda x: -x[0])
-    partition = int(K / 4) if int(K / 4) > 0 else 1
 
-    index = [i[1] for i in sk_sorted[0:partition]]
-    index
+    index = [i[1] for i in sk_sorted[0:N]]
 
     for i in index:
         print(" ".join(sents[i]))
@@ -45,6 +43,9 @@ if __name__ == "__main__":
         help="""Method to summarize:\n\t0: Steinberg and Jezek;\n\t1: Murray""",
         choices=[0, 1],
         type=int,
+    )
+    parser.add_argument(
+        "number_sentences", help="number of sentences on the summaty", type=int
     )
 
     args = parser.parse_args()
@@ -72,4 +73,4 @@ if __name__ == "__main__":
     if args.method:
         Murray()
     else:
-        SteinbergerAndJezek(S, V, num_sents)
+        SteinbergerAndJezek(S, V, num_sents, args.number_sentences)
