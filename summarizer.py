@@ -6,13 +6,30 @@ import numpy as np
 MSG_DESCRIPTION = "Summarize text of a given file."
 
 
+def createInputMatrixAndSVD(sents):
+    words = set(chain.from_iterable(sents))
+    word_index = {word: k for k, word in enumerate(words)}
+
+    num_words = len(word_index)
+    num_sents = len(sents)
+    # Input Matrix Creation
+    X = np.zeros((num_words, num_sents))
+    for d, sent in enumerate(sents):
+        for word in sent:
+            w = word_index[word]
+            X[w, d] += 1
+    # Singular Value Decomposition (SVD)
+    U, S, Vt = np.linalg.svd(X)
+    V = Vt.transpose()
+    return U, S, Vt, V, num_sents
+
+
 def tokenizeSentences(text):
     return [word_tokenize(i) for i in sent_tokenize(text)]
 
 
-def SteinbergerAndJezek(sigma, v, K, N):
+def SteinbergerAndJezek(sigma, v, K, N, sents):
     sk = []
-
     for k in range(K):
         sum_ = 0
         for i in range(len(V[k])):
@@ -24,12 +41,34 @@ def SteinbergerAndJezek(sigma, v, K, N):
 
     index = [i[1] for i in sk_sorted[0:N]]
 
-    for i in index:
+    for i in sorted(index):
         print(" ".join(sents[i]))
 
 
-def Murray():
-    return
+def CrossMethod(Vt, N, sents):
+    # Pre processing step
+    Vt = np.abs(Vt)
+    avgs = []
+    for concept in Vt:
+        avgs += [np.mean(concept)]
+
+    for i in range(len(Vt)):
+        for j in range(len(Vt)):
+            Vt[i][j] = Vt[i][j] if Vt[i][j] > avgs[i] else 0
+
+    # length of sentences = sum of Vt collumns
+    l = Vt.sum(axis=0)
+
+    length = []
+    for i in range(len(l)):
+        length += [(l[i], i)]
+
+    length_sorted = sorted(length, key=lambda x: -x[0])
+    index = [i[1] for i in length_sorted[0:N]]
+
+    # using sorted to keep the original text order
+    for i in sorted(index):
+        print(" ".join(sents[i]))
 
 
 if __name__ == "__main__":
@@ -40,12 +79,18 @@ if __name__ == "__main__":
     parser.add_argument("file", help="File containing the text to be summarized.")
     parser.add_argument(
         "method",
-        help="""Method to summarize:\n\t0: Steinberg and Jezek;\n\t1: Murray""",
+        help="""Method to summarize (default: 0):\n\t0: Steinberg and Jezek;\n\t1: Murray""",
         choices=[0, 1],
         type=int,
+        default=0,
+        nargs="?",
     )
     parser.add_argument(
-        "number_sentences", help="number of sentences on the summaty", type=int
+        "number_sentences",
+        help="number of sentences on the summary (default: 3)",
+        type=int,
+        default=3,
+        nargs="?",
     )
 
     args = parser.parse_args()
@@ -55,22 +100,9 @@ if __name__ == "__main__":
 
     sents = tokenizeSentences(text)
 
-    words = set(chain.from_iterable(sents))
-    word_index = {word: k for k, word in enumerate(words)}
-
-    num_words = len(word_index)
-    num_sents = len(sents)
-
-    X = np.zeros((num_words, num_sents))
-    for d, sent in enumerate(sents):
-        for word in sent:
-            w = word_index[word]
-            X[w, d] += 1
-
-    U, S, Vt = np.linalg.svd(X)
-    V = Vt.transpose()
+    U, S, Vt, V, num_sents = createInputMatrixAndSVD(sents)
 
     if args.method:
-        Murray()
+        CrossMethod(Vt, args.number_sentences, sents)
     else:
-        SteinbergerAndJezek(S, V, num_sents, args.number_sentences)
+        SteinbergerAndJezek(S, V, num_sents, args.number_sentences, sents)
