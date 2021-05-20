@@ -28,11 +28,11 @@ def tokenizeSentences(text):
     return [word_tokenize(i) for i in sent_tokenize(text)]
 
 
-def SteinbergerAndJezek(sigma, v, K, N, sents):
+def SteinbergerAndJezek(sigma, V, K, N, sents, c):
     sk = []
     for k in range(K):
         sum_ = 0
-        for i in range(len(V[k])):
+        for i in range(c):
             sum_ += (V[k][i]) ** 2 * (sigma[i]) ** 2
 
         sk += [(np.sqrt(sum_), k)]
@@ -45,15 +45,15 @@ def SteinbergerAndJezek(sigma, v, K, N, sents):
         print(" ".join(sents[i]))
 
 
-def CrossMethod(Vt, N, sents):
+def CrossMethod(Vt, N, sents, c):
     # Pre processing step
     Vt = np.abs(Vt)
     avgs = []
     for concept in Vt:
         avgs += [np.mean(concept)]
 
-    for i in range(len(Vt)):
-        for j in range(len(Vt)):
+    for i in range(c):
+        for j in range(len(Vt[i])):
             Vt[i][j] = Vt[i][j] if Vt[i][j] > avgs[i] else 0
 
     # length of sentences = sum of Vt collumns
@@ -72,6 +72,8 @@ def CrossMethod(Vt, N, sents):
 
 
 if __name__ == "__main__":
+
+
 
     parser = ArgumentParser(
         description=MSG_DESCRIPTION, formatter_class=RawTextHelpFormatter
@@ -93,6 +95,14 @@ if __name__ == "__main__":
         nargs="?",
     )
 
+    parser.add_argument(
+        "number_concepts",
+        help="number of concepts (default: max)",
+        type=int,
+        default=-1,
+        nargs="?",
+    )
+
     args = parser.parse_args()
 
     with open(args.file, "r", encoding="utf-8") as f:
@@ -102,7 +112,12 @@ if __name__ == "__main__":
 
     U, S, Vt, V, num_sents = createInputMatrixAndSVD(sents)
 
-    if args.method:
-        CrossMethod(Vt, args.number_sentences, sents)
+    if args.number_concepts == -1 or args.number_concepts > len(Vt):
+        c = len(Vt)
     else:
-        SteinbergerAndJezek(S, V, num_sents, args.number_sentences, sents)
+        c = args.number_concepts
+
+    if args.method:
+        CrossMethod(Vt, args.number_sentences, sents, c)
+    else:
+        SteinbergerAndJezek(S, V, num_sents, args.number_sentences, sents, c)
