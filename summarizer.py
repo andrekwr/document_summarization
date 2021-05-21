@@ -73,8 +73,6 @@ def CrossMethod(Vt, N, sents, c):
 
 if __name__ == "__main__":
 
-
-
     parser = ArgumentParser(
         description=MSG_DESCRIPTION, formatter_class=RawTextHelpFormatter
     )
