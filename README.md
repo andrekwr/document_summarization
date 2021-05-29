@@ -16,7 +16,10 @@ cada palavra para a sentença. As células são preenchidas de acordo com a freq
 ### Passo 2
 Utilizamos um método chamado SVD (Singular Value Decomposition) que modela as relações entre palavras e sentenças da matriz de entrada, que em seguida gera três outras matrizes.
 
-![SVD](svd_eq.png)
+<p align="center">
+    <img src="svd_eq.png">
+</p>
+
 _Fonte: Steinberger J, Jezek K. Using Latent Semantic Analysis in text summarization and summary evaluation. In: Proceedings of ISIM ‘04 2004: 93–100._
 
 ### Passo 3
@@ -30,7 +33,11 @@ No cálculo da pontuação das sentenças, o número de conceitos pode ser dado 
 caso não seja, todos os conceitos extraídos são utilizados
 ``` 
 
-![Steinberger](steinberger_eq.png)
+
+<p align="center">
+    <img src="steinberger_eq.png">
+</p>
+
 _Fonte: Steinberger J, Jezek K. Using Latent Semantic Analysis in text summarization and summary evaluation. In: Proceedings of ISIM ‘04 2004: 93–100._
 
 **Cross Method**  
@@ -43,14 +50,18 @@ pontuações, calculadas pela soma dos valores dos conceitos, são escolhidas pa
 No cálculo da pontuação das sentenças, o número de conceitos pode ser dado pelo usuário, 
 caso não seja, todos os conceitos extraídos são utilizados
 ``` 
-![Cross](cross_eq.png)  
+
+<p align="center">
+    <img src="cross_eq.png">
+</p>
+
 _Fonte: Ozsoy MG, Cicekli I, Alpaslan FN. Text summarization of Turkish texts using Latent Semantic Analysis. In: Proceedings of
 the 23rd international conference on computational linguistics (Coling 2010) 2010: 869–876._
 
 ## Algoritmo Python
 
 ### summarizer
-O sumarizador se encontra no arquivo summarizer.py, ele contém os dois métodos utilizados e as etapas anteriores.
+O sumarizador se encontra no arquivo summarizer.py, ele contém os dois métodos utilizados e implementa as etapas anteriores.
 
 **Executando:**
 
